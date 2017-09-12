@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 /* strlen: return length of s */
+/* strlen() is defined in the standard header <string.h> */
 
 
 strlen (char s[])
