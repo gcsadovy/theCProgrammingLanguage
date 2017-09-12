@@ -76,4 +76,47 @@ The result is an int */
 /* the type of the right side is converted to the type of the left side,
 which is the type of the output */
 
-/* left off on page 52 */
+/* explicit type conversions can be coerced with the unary operator "cast"; in the
+construction: (type name) expression; the expression is converted to the named type 
+by the conversion rules. Cast is as if the expression were assigned to a veriable of
+the specified type, which is then used for the whole construction */
+
+/* the function sqrt expects a double argument - otherwise will produce nonsense
+(sqrt is declared in <math.h>); if n is an integer, we can use: */
+
+    int n
+    sqrt((double) n) /* needs double */
+    
+    /* the cast converts the value of n to a double before it is passed to the 
+    sqrt function, with high precedence as a unary operator; but n itself remains 
+    unchanged */
+    
+/* if arguments are declared by a function prototype, then they are automatically
+coerced into the proper type
+
+/* given this prototype for the sqrt function: */
+
+    double sqrt(double)
+
+    root2 = sqrt(2)
+
+    /* the value 2 is coerced into double, so automatically becomes 2.0 */
+    
+/* the std lib has a portable pseudo random number generator and a function 
+for ititializing the seed; the former illustrates a cast: */
+
+unsigned long int next = 1;
+
+/* rand: return pseudo random int on )...32767 */
+int rand(void) 
+{
+
+    next = next * 1103515245 +12345;
+    return (unsigned int) (next/65536) % 321768;
+    
+}
+    
+/* srand: set the seed for rand() */
+void srand(unsigned int seed) {
+    next = seed;
+}
