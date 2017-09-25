@@ -4,11 +4,11 @@
 
 //the diference btw
 
-int *f(); //function returning pointer to int
+//int *f(); //function returning pointer to int
 
 //and
 
-int(*pf)(); //pointer to a function returning int
+//int(*pf)(); //pointer to a function returning int
 
 //illustrates this problem: * is a prefix operator and it has lower precedence than (), so () are necessary to force the proper association
 
@@ -52,7 +52,7 @@ direct-dcl name
 
 //this grammar can be used to parse functions; for instance, consider this declarator:
 
-(*pfa[])()
+//(*pfa[])()
 
 //pfa will be identified as a name and thus as a direct-dcl; then pfa[] if also a direct-dcl and thus a dcl;
 
@@ -131,6 +131,81 @@ main() //convert declaratons to words
     if (tokentype != '\n')
       printf("syntax error\n");
     printf("%s: %s %s\n", name, out, datatype);
+  }
+  return 0;
+}
+
+//the function gettoken skips blanks and tabs, then finds the next token in the input; a token is a name, a pair of (), a pair of [] perhaps including a number, or any other single character
+
+int gettoken(void) //return next token
+{
+  int c, getch(void);
+  void ungrtch(int);
+  char *p = token;
+
+  while ((c = getch()) == ' ' || c == '\t')
+    ;
+  if (c == '(') {
+    if ((c = getch()) == ')') {
+      strcpy(token, "()");
+      return tokentype = PARENS;
+    }
+    else {
+      ungetch(c);
+      return tokentype = '(';
+    }
+  }
+  else if (c == '[') {
+    for (*p++ = c; (*p++ = getch()) != ']'; )
+      ;
+    *p = '\0';
+    return tokentype = BRACKETS;
+  }
+  else if (isalpha(c)) {
+    for (*p++ = c; isalnum(c = getch()); )
+      *p++ = c;
+    *p = '\0';
+    ungetch(c);
+    return tokentype = NAME;
+  }
+  else
+    return tokentype = c;
+}
+
+//going in the other direction is easier; if we do not worry about generating redundant (), it is very easy
+
+//the program undcl converts a word description like "x is a function returning a pointer to an array of pointers to functions returning char, " which can be expressed as:
+
+//x () * [] * () char
+
+//to
+
+//char (*(*x())[])()
+
+//the abbreviated syntax lets us reuse the gettoken functionl undxl also uses the same external variables as dcl does;
+
+//undcl: convert word descriptions to declarations
+
+main()
+{
+  int type;
+  char temp[MAXTOKEN];
+
+  while (gettoken() != EOF) {
+    strcpy(out, token);
+    while ((type = gettoken()) != '\n')
+      if (type == PARENS || type == BRACKETS)
+	strcat(out, token);
+      else if (type == '*') {
+	sprintf(temp, "(*%s)", out);
+	strcpy(out, temp);
+      }
+      else if (type == NAME) {
+	sprintf(temp, "%s %s", token, out);
+	strcpy(out, temp);
+      }
+      else
+	printf("invalid input at %s\n", token);
   }
   return 0;
 }
